@@ -1,26 +1,108 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #131318;
+  --foreground: #e4e1e9;
+
+  --surface-container: #1f1f25;
+  --on-secondary-fixed-variant: #4f319c;
+  --surface-container-lowest: #0e0e13;
+  --on-tertiary-fixed-variant: #572ba0;
+  --primary: #2563EB;
+  --secondary: #7C3AED;
+  --accent: #06B6D4;
+  --primary-container: #7c3aed;
+  --on-primary-fixed: #25005a;
+  --outline: #958da1;
+  --surface-dim: #131318;
+  --tertiary-fixed-dim: #d3bbff;
+  --inverse-surface: #e4e1e9;
+  --surface: #131318;
+  --on-secondary: #381385;
+  --on-error: #690005;
+  --on-primary-container: #ede0ff;
+  --surface-variant: #35343a;
+  --on-tertiary-container: #eee1ff;
+  --on-secondary-fixed: #21005e;
+  --on-surface: #e4e1e9;
+  --surface-container-low: #1b1b20;
+  --on-tertiary-fixed: #260059;
+  --on-primary-fixed-variant: #5a00c6;
+  --inverse-on-surface: #303030;
+  --tertiary-fixed: #ebdcff;
+  --error: #ffb4ab;
+  --tertiary: #d3bbff;
+  --error-container: #93000a;
+  --secondary-fixed-dim: #cebdff;
+  --on-primary: #3f008e;
+  --on-error-container: #ffdad6;
+  --primary-fixed: #eaddff;
+  --surface-container-highest: #35343a;
+  --primary-fixed-dim: #2563EB;
+  --secondary-brand: #7C3AED;
+  --accent-brand: #06B6D4;
+  --secondary-container: #4f319c;
+  --on-tertiary: #3f0689;
+  --on-background: #e4e1e9;
+  --tertiary-container: #784fc3;
+  --secondary-fixed: #e8ddff;
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-surface-container: var(--surface-container);
+  --color-on-secondary-fixed-variant: var(--on-secondary-fixed-variant);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-on-tertiary-fixed-variant: var(--on-tertiary-fixed-variant);
+  --color-primary: var(--primary);
+  --color-outline-variant: var(--outline-variant);
+  --color-primary-container: var(--primary-container);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface: var(--surface);
+  --color-on-surface: var(--on-surface);
+  --color-secondary: var(--secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-container: var(--tertiary-container);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-headline: "Space Grotesk", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --font-label: "Manrope", sans-serif;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.cinematic-overlay {
+  background: linear-gradient(to bottom, rgba(19, 19, 24, 0.85), rgba(19, 19, 24, 1));
+}
+
+.purple-glow {
+  filter: drop-shadow(0 0 15px rgba(124, 58, 237, 0.3));
+}
+
+.text-gradient-purple {
+  background: linear-gradient(45deg, #2563EB, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cinematic-gradient {
+  background: linear-gradient(180deg, rgba(19, 19, 24, 0) 0%, rgba(19, 19, 24, 0.8) 70%, rgba(19, 19, 24, 1) 100%);
+}
+
+.blueprint-bg {
+  background-image: radial-gradient(rgba(124, 58, 237, 0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
