@@ -4,11 +4,14 @@ import Header from "../components/Header"
 import Footer from "../components/Footer"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { db } from "../../lib/firebase"
-import { collection, onSnapshot } from "firebase/firestore"
+import { auth, db } from "../../lib/firebase"
+import { collection, onSnapshot, query, where } from "firebase/firestore"
+import { useAuthState } from "react-firebase-hooks/auth"
 
 export default function PricingPage() {
     const [plans, setPlans] = useState<any[]>([])
+    const [purchases, setPurchases] = useState<any[]>([])
+    const [user] = useAuthState(auth)
     const [isAnnual, setIsAnnual] = useState(false)
 
     useEffect(() => {
@@ -18,6 +21,20 @@ export default function PricingPage() {
         return () => unsub()
     }, [])
 
+    useEffect(() => {
+        if (user) {
+            const q = query(collection(db, "purchases"), where("userId", "==", user.uid))
+            const unsub = onSnapshot(q, (snapshot) => {
+                setPurchases(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+            })
+            return () => unsub()
+        }
+    }, [user])
+
+    const hasPlan = (planId: string) => {
+        return purchases.some(p => p.planId === planId && p.status === 'approved')
+    }
+
     const filteredPlans = plans.filter(plan => plan.duration === (isAnnual ? "annually" : "monthly"))
 
     return (
@@ -25,33 +42,26 @@ export default function PricingPage() {
             <Header />
 
             {/* Hero Section */}
-            <section className="relative min-h-[500px] flex flex-col items-center justify-center px-6 overflow-hidden">
-                <div className="absolute inset-0 z-0 opacity-20 filter grayscale contrast-125">
-                    <img className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1IWNJwEkU9ntarj5yS34JLr1onnsrReTCiremDU3_aWPPiy0qeP_AZewpLc4xhrJU9JjeOsBQAGTBq7hxmj9tY7jz5-UKjfFONX72jLBuiGviDEeaBC5bOZjlPq4O7I49ujQZG07879mK_7QV94hN3dsPd_JZHBy-ZzLYMJOuhyxGeXPYw00MWIbSijgCUadpGHI-dOOC0tu7zTQSaW2tza7PjXD6nWDUTVommvdo6SRNbbDpdgWUqw_OYXh3x8cIWAHyQ8nkQ2I" alt="Hero Background" />
-                </div>
-                <div className="relative z-10 text-center max-w-4xl mx-auto py-24">
-                    <h1 className="font-headline text-5xl md:text-8xl font-extrabold tracking-tighter mb-8 text-white leading-[0.9]">
-                        Tiered <span className="text-primary-variant animate-pulse">Intelligence.</span>
+            <section className="relative min-h-[400px] flex flex-col items-center justify-center px-6 overflow-hidden">
+                <div className="relative z-10 text-center max-w-4xl mx-auto py-12">
+                    <h1 className="font-headline text-4xl md:text-7xl font-bold tracking-tight mb-8 text-white">
+                        Simple <span className="text-primary">Pricing.</span>
                     </h1>
-                    <p className="text-on-surface-variant text-lg md:text-2xl max-w-2xl mx-auto mb-16 font-body opacity-80 decoration-primary-container italic">
-                        Select the core licensing duration that synchronizes with your operational scale.
-                    </p>
 
                     {/* Pricing Toggle */}
-                    <div className="inline-flex items-center gap-6 bg-surface-container-high/40 p-2 rounded-2xl border border-white/5 backdrop-blur-xl">
-                        <button onClick={() => setIsAnnual(false)} className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${!isAnnual ? 'bg-primary text-white shadow-lg' : 'text-on-surface-variant hover:text-white'}`}>Monthly</button>
-                        <button onClick={() => setIsAnnual(true)} className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${isAnnual ? 'bg-primary text-white shadow-lg' : 'text-on-surface-variant hover:text-white'}`}>Annually</button>
+                    <div className="inline-flex items-center gap-4 bg-surface-container-high/40 p-1.5 rounded-2xl border border-white/5 backdrop-blur-xl">
+                        <button onClick={() => setIsAnnual(false)} className={`px-8 py-2.5 rounded-xl font-bold text-xs transition-all ${!isAnnual ? 'bg-primary text-white' : 'text-on-surface-variant hover:text-white'}`}>Monthly</button>
+                        <button onClick={() => setIsAnnual(true)} className={`px-8 py-2.5 rounded-xl font-bold text-xs transition-all ${isAnnual ? 'bg-primary text-white' : 'text-on-surface-variant hover:text-white'}`}>Annually</button>
                     </div>
                 </div>
             </section>
 
             {/* Dynamic Pricing Cards */}
-            <section className="relative px-6 py-24">
-                <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <section className="relative px-6 py-12">
+                <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
                     {filteredPlans.length === 0 ? (
-                        <div className="col-span-full py-24 text-center bg-surface-container-high/20 rounded-[3rem] border border-white/5 backdrop-blur-xl">
-                            <h2 className="text-2xl font-headline font-bold text-white mb-2 italic">Systems Offline</h2>
-                            <p className="text-on-surface-variant">No tiers deployed for this specific duration.</p>
+                        <div className="col-span-full py-20 text-center bg-surface-container-high/20 rounded-3xl border border-white/5">
+                            <p className="text-on-surface-variant text-sm italic">Nothing here yet.</p>
                         </div>
                     ) : (
                         filteredPlans.map((plan) => (
@@ -64,6 +74,7 @@ export default function PricingPage() {
                                 popular={plan.isPopular}
                                 buttonText={plan.buttonText}
                                 duration={plan.duration}
+                                alreadyOwned={hasPlan(plan.id)}
                             >
                                 {plan.features?.map((f: string, i: number) => (
                                     <PricingFeature key={i} text={f} />
@@ -79,44 +90,41 @@ export default function PricingPage() {
     )
 }
 
-function PricingCard({ title, desc, price, icon, children, popular, buttonText, duration }: any) {
+function PricingCard({ title, desc, price, icon, children, popular, buttonText, duration, alreadyOwned }: any) {
     return (
-        <div className={`group p-10 rounded-[3rem] bg-surface-container-low border ${popular ? 'border-2 border-primary relative shadow-[0_0_50px_rgba(37,99,235,0.1)] transform md:-translate-y-4' : 'border-white/5'} hover:border-primary/40 transition-all duration-700 flex flex-col h-full overflow-hidden`}>
-            {popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white px-6 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase shadow-xl">Most Popular</div>}
-
-            <div className="mb-10 flex items-center gap-6">
-                <div className={`w-16 h-16 rounded-2xl ${popular ? 'bg-primary/20' : 'bg-surface-container-highest'} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <span className="material-symbols-outlined text-4xl text-primary">{icon || 'bolt'}</span>
-                </div>
-                <div>
-                    <h3 className="font-headline text-2xl font-bold text-white">{title}</h3>
-                    <p className="text-on-surface-variant text-xs italic">Core System Entry</p>
-                </div>
+        <div className={`p-8 rounded-[2rem] bg-surface-container-low border ${popular ? 'border-primary ring-1 ring-primary/20' : 'border-white/5'} flex flex-col h-full overflow-hidden transition-all hover:border-primary/50 group`}>
+            <div className="mb-8 flex items-center gap-4">
+                <span className="material-symbols-outlined text-3xl text-primary">{icon || 'bolt'}</span>
+                <h3 className="font-bold text-xl text-white">{title}</h3>
             </div>
 
-            <div className="mb-10">
-                <span className="text-5xl font-headline font-extrabold text-white tracking-tighter">${price}</span>
-                <span className="text-on-surface-variant text-sm ml-2 font-mono italic">/ {duration}</span>
+            <div className="mb-6 flex items-baseline gap-1">
+                <span className="text-4xl font-bold text-white">${price}</span>
+                <span className="text-on-surface-variant text-[10px] font-mono italic opacity-60">/ {duration}</span>
             </div>
 
-            <p className="text-on-surface-variant text-sm mb-10 leading-relaxed italic opacity-80">{desc}</p>
-
-            <ul className="space-y-4 mb-12 flex-grow">
+            <ul className="space-y-3 mb-10 flex-grow">
                 {children}
             </ul>
 
-            <Link href="/login" className={`w-full py-5 rounded-2xl text-center font-bold text-lg shadow-2xl transition-all duration-500 active:scale-95 ${popular ? 'bg-primary text-white hover:shadow-[0_0_30px_rgba(37,99,235,0.4)]' : 'bg-surface-container-highest text-white border border-white/5 hover:bg-white hover:text-black'}`}>
-                {buttonText || 'Deploy Core'}
-            </Link>
+            {alreadyOwned ? (
+                <Link href="/dashboard" className="w-full py-4 rounded-xl text-center font-bold text-xs bg-green-500/10 text-green-400 border border-green-500/20">
+                    You already buy the plan
+                </Link>
+            ) : (
+                <Link href="/login" className={`w-full py-4 rounded-xl text-center font-bold text-xs transition-all ${popular ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white/5 text-white border border-white/10 hover:bg-white hover:text-black'}`}>
+                    {buttonText || 'Get Started'}
+                </Link>
+            )}
         </div>
     )
 }
 
 function PricingFeature({ text }: any) {
     return (
-        <li className="flex items-center gap-4 text-sm text-on-surface-variant">
-            <span className="material-symbols-outlined text-green-400 text-lg">check_circle</span>
-            <span className="group-hover:text-white transition-colors">{text}</span>
+        <li className="flex items-center gap-3 text-xs text-on-surface-variant">
+            <span className="material-symbols-outlined text-green-400 text-sm">check_circle</span>
+            <span>{text}</span>
         </li>
     )
 }

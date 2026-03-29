@@ -9,10 +9,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
 
-const ICONS = [
-    "bolt", "shield", "psychology", "grid_view", "rocket_launch",
-    "terminal", "settings_suggest", "auto_mode", "cloud_sync", "memory"
-]
+const ICONS = ["bolt", "shield", "psychology", "grid_view", "rocket_launch", "terminal", "settings_suggest", "auto_mode", "cloud_sync", "memory"]
 
 export default function AdminDashboardPage() {
     const [user, loading] = useAuthState(auth)
@@ -72,10 +69,10 @@ export default function AdminDashboardPage() {
             }
             if (editingPlan) {
                 await updateDoc(doc(db, "plans", editingPlan.id), planData)
-                alert("Plan updated!")
+                alert("Updated.")
             } else {
                 await addDoc(collection(db, "plans"), { ...planData, timestamp: serverTimestamp() })
-                alert("Plan deployed!")
+                alert("Deployed.")
             }
             setNewPlan({ name: "", price: "", description: "", features: "", buttonText: "Get Started", icon: "bolt", duration: "monthly", isPopular: false })
             setFile(null); setEditingPlan(null);
@@ -93,11 +90,6 @@ export default function AdminDashboardPage() {
         setActiveTab("plans")
     }
 
-    const deletePlan = async (id: string) => {
-        if (!confirm("Delete plan?")) return
-        await deleteDoc(doc(db, "plans", id))
-    }
-
     const updatePurchaseStatus = async (purchase: any, status: "approved" | "declined") => {
         try {
             const plan = plans.find(p => p.id === purchase.planId)
@@ -106,270 +98,204 @@ export default function AdminDashboardPage() {
                 fileUrl: status === "approved" ? (plan?.fileUrl || "") : "",
                 approvedAt: serverTimestamp()
             })
-            alert(`Purchase ${status}!`)
+            alert(`Purchase ${status}.`)
         } catch (err: any) { alert(err.message) }
+    }
+
+    const deletePlan = async (id: string) => {
+        if (!confirm("Delete?")) return
+        await deleteDoc(doc(db, "plans", id))
     }
 
     const totalRevenue = purchases.filter(p => p.status === 'approved').reduce((acc, p) => acc + (Number(p.amount) || 0), 0)
 
-    if (loading) return <div className="min-h-screen bg-background flex items-center justify-center text-white font-mono">Loading Terminal...</div>
+    if (loading) return <div className="min-h-screen bg-background flex items-center justify-center text-white font-mono">Loading Admin Hub...</div>
 
     return (
-        <main className="min-h-screen bg-background text-white pt-44 pb-20 px-8 max-w-7xl mx-auto flex flex-col">
+        <main className="min-h-screen bg-background text-white pt-32 pb-20 px-6 max-w-6xl mx-auto flex flex-col">
             <Header />
 
-            <div className="flex flex-col md:flex-row justify-between items-start mb-12 border-b border-white/5 pb-12 gap-8">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-10 border-b border-white/5 pb-8 gap-4">
                 <div>
-                    <h1 className="text-6xl font-headline font-extrabold tracking-tighter uppercase leading-[0.8]">Command <span className="text-primary-variant animate-pulse">Core.</span></h1>
-                    <p className="text-on-surface-variant text-lg mt-4 italic opacity-60">Strategic oversight for the SubKitt infrastructure.</p>
-                </div>
-
-                {/* Stats Widgets */}
-                <div className="flex flex-wrap gap-4">
-                    <StatBox label="Total Users" value={usersList.length} icon="group" color="primary" />
-                    <StatBox label="Active Tiers" value={plans.length} icon="inventory_2" color="secondary" />
-                    <StatBox label="Revenue" value={`$${totalRevenue}`} icon="payments" color="green-400" />
+                    <h1 className="text-3xl font-headline font-bold text-white tracking-tight uppercase">Dashboard Control</h1>
+                    <p className="text-on-surface-variant text-xs mt-1 opacity-60 italic">Core oversight system active.</p>
                 </div>
             </div>
 
-            {/* TAB NAVIGATION */}
-            <nav className="flex flex-wrap gap-2 mb-12 bg-surface-container-high/40 p-2 rounded-3xl border border-white/5 backdrop-blur-xl w-fit">
-                <TabButton active={activeTab === "plans"} onClick={() => setActiveTab("plans")} icon="rocket_launch" label="Plan Forge" />
-                <TabButton active={activeTab === "customers"} onClick={() => setActiveTab("customers")} icon="account_balance_wallet" label="Customer Ledger" />
-                <TabButton active={activeTab === "users"} onClick={() => setActiveTab("users")} icon="groups" label="User Registry" />
-                <TabButton active={activeTab === "financials"} onClick={() => setActiveTab("financials")} icon="analytics" label="Financial Terminal" />
+            {/* MINIMAL NAVBAR */}
+            <nav className="flex gap-1 mb-8 bg-surface-container-low p-1 rounded-2xl border border-white/5 w-fit">
+                <TabBtn active={activeTab === "plans"} onClick={() => setActiveTab("plans")} icon="inventory_2" label="Plans" />
+                <TabBtn active={activeTab === "customers"} onClick={() => setActiveTab("customers")} icon="account_balance_wallet" label="Sales" />
+                <TabBtn active={activeTab === "users"} onClick={() => setActiveTab("users")} icon="groups" label="Users" />
+                <TabBtn active={activeTab === "financials"} onClick={() => setActiveTab("financials")} icon="analytics" label="Stats" />
             </nav>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-
-                {/* CONTENT AREA */}
-                <div className="lg:col-span-12">
-                    {activeTab === "plans" && (
-                        <div className="grid lg:grid-cols-2 gap-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="space-y-6">
-                                <h2 className="text-2xl font-headline font-bold flex items-center gap-3">Deployed Systems</h2>
-                                <div className="grid gap-4">
-                                    {plans.map(p => (
-                                        <div key={p.id} className="bg-surface-container-low p-6 rounded-3xl border border-white/5 hover:border-primary/40 transition-all group flex justify-between items-center">
-                                            <div className="flex items-center gap-4">
-                                                <span className="material-symbols-outlined text-4xl text-primary">{p.icon}</span>
-                                                <div>
-                                                    <h3 className="font-bold text-lg">{p.name}</h3>
-                                                    <p className="text-on-surface-variant text-xs">${p.price} • {p.duration}</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <button onClick={() => editPlan(p)} className="p-3 bg-white/5 rounded-2xl hover:text-primary transition-all"><span className="material-symbols-outlined">edit</span></button>
-                                                <button onClick={() => deletePlan(p.id)} className="p-3 bg-red-500/10 rounded-2xl text-red-400 hover:bg-red-500/20"><span className="material-symbols-outlined">delete</span></button>
+            <div className="flex-grow">
+                {activeTab === "plans" && (
+                    <div className="grid lg:grid-cols-2 gap-8 animate-in fade-in duration-300">
+                        <section className="space-y-4">
+                            <h2 className="text-sm font-bold uppercase tracking-widest text-primary">Deployed Tiers ({plans.length})</h2>
+                            <div className="grid gap-3">
+                                {plans.map(p => (
+                                    <div key={p.id} className="bg-surface-container-low p-5 rounded-2xl border border-white/5 flex justify-between items-center text-sm">
+                                        <div className="flex items-center gap-3">
+                                            <span className="material-symbols-outlined text-xl text-primary">{p.icon}</span>
+                                            <div>
+                                                <h3 className="font-bold">{p.name}</h3>
+                                                <p className="text-on-surface-variant text-[10px]">${p.price} • {p.duration}</p>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="bg-surface-container-high/60 p-10 rounded-[3rem] border border-white/10 shadow-2xl h-fit">
-                                <h2 className="text-2xl font-headline font-bold mb-8">{editingPlan ? "Modify Spec" : "Blueprint Creation"}</h2>
-                                <form onSubmit={handleCreateOrUpdatePlan} className="space-y-6">
-                                    <div className="grid grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-primary uppercase tracking-widest ml-1">Designation</label>
-                                            <input type="text" value={newPlan.name} onChange={e => setNewPlan({ ...newPlan, name: e.target.value })} required className="w-full bg-surface-container-lowest border border-white/5 rounded-2xl p-5" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-primary uppercase tracking-widest ml-1">Cost ($)</label>
-                                            <input type="number" value={newPlan.price} onChange={e => setNewPlan({ ...newPlan, price: e.target.value })} required className="w-full bg-surface-container-lowest border border-white/5 rounded-2xl p-5" />
+                                        <div className="flex gap-1">
+                                            <button onClick={() => editPlan(p)} className="p-2 bg-white/5 rounded-lg text-white hover:text-primary transition-all"><span className="material-symbols-outlined text-sm">edit</span></button>
+                                            <button onClick={() => deletePlan(p.id)} className="p-2 bg-red-500/10 rounded-lg text-red-500 hover:bg-red-500/20"><span className="material-symbols-outlined text-sm">delete</span></button>
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-primary uppercase tracking-widest ml-1">Icon Pack</label>
-                                            <div className="flex flex-wrap gap-2 p-4 bg-surface-container-lowest border border-white/5 rounded-2xl">
-                                                {ICONS.map(i => (
-                                                    <button key={i} type="button" onClick={() => setNewPlan({ ...newPlan, icon: i })} className={`p-2 rounded-lg transition-all ${newPlan.icon === i ? 'bg-primary' : 'text-on-surface-variant hover:text-white'}`}>
-                                                        <span className="material-symbols-outlined text-sm">{i}</span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="space-y-4">
-                                            <div className="space-y-2">
-                                                <label className="text-[10px] font-bold text-primary uppercase tracking-widest ml-1">Lifecycle</label>
-                                                <select value={newPlan.duration} onChange={e => setNewPlan({ ...newPlan, duration: e.target.value })} className="w-full bg-surface-container-lowest border border-white/5 rounded-2xl p-5">
-                                                    <option value="monthly" className="bg-background">Monthly</option>
-                                                    <option value="annually" className="bg-background">Annually</option>
-                                                </select>
-                                            </div>
-                                            <button type="button" onClick={() => setNewPlan({ ...newPlan, isPopular: !newPlan.isPopular })} className={`w-full p-4 rounded-2xl border font-bold text-xs transition-all ${newPlan.isPopular ? 'bg-primary border-primary' : 'border-white/5 text-on-surface-variant'}`}>
-                                                {newPlan.isPopular ? "MOST POPULAR ACTIVE" : "STANDARD TIER"}
+                                ))}
+                            </div>
+                        </section>
+                        <section className="bg-surface-container-high/40 p-10 rounded-[2.5rem] border border-white/5 h-fit text-sm">
+                            <h2 className="text-lg font-bold mb-6">{editingPlan ? "Edit Spec" : "Add Plan"}</h2>
+                            <form onSubmit={handleCreateOrUpdatePlan} className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] uppercase font-bold text-on-surface-variant ml-1">Name</label>
+                                        <input type="text" value={newPlan.name} onChange={e => setNewPlan({ ...newPlan, name: e.target.value })} required className="w-full bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] uppercase font-bold text-on-surface-variant ml-1">Price ($)</label>
+                                        <input type="number" value={newPlan.price} onChange={e => setNewPlan({ ...newPlan, price: e.target.value })} required className="w-full bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3" />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] uppercase font-bold text-on-surface-variant ml-1">Duration</label>
+                                        <select value={newPlan.duration} onChange={e => setNewPlan({ ...newPlan, duration: e.target.value })} className="w-full bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3">
+                                            <option value="monthly" className="bg-background">Monthly</option>
+                                            <option value="annually" className="bg-background">Annually</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-1 flex flex-col pt-5">
+                                        <button type="button" onClick={() => setNewPlan({ ...newPlan, isPopular: !newPlan.isPopular })} className={`p-3 rounded-xl border text-[10px] font-bold transition-all ${newPlan.isPopular ? 'bg-primary border-primary' : 'border-white/10 text-on-surface-variant'}`}>
+                                            {newPlan.isPopular ? "MOST POPULAR: YES" : "MOST POPULAR: NO"}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] uppercase font-bold text-on-surface-variant ml-1">Icons</label>
+                                    <div className="flex flex-wrap gap-2 p-3 bg-surface-container-lowest border border-white/5 rounded-xl">
+                                        {ICONS.map(i => (
+                                            <button key={i} type="button" onClick={() => setNewPlan({ ...newPlan, icon: i })} className={`p-1 rounded-md ${newPlan.icon === i ? 'bg-primary' : 'text-on-surface-variant'}`}>
+                                                <span className="material-symbols-outlined text-sm">{i}</span>
                                             </button>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-primary uppercase tracking-widest ml-1">Feature Chips (Comma Separated)</label>
-                                        <textarea value={newPlan.features} onChange={e => setNewPlan({ ...newPlan, features: e.target.value })} className="w-full bg-surface-container-lowest border border-white/5 rounded-2xl p-5 h-24" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-primary uppercase tracking-widest ml-1">Action Button Text</label>
-                                        <input type="text" value={newPlan.buttonText} onChange={e => setNewPlan({ ...newPlan, buttonText: e.target.value })} className="w-full bg-surface-container-lowest border border-white/5 rounded-2xl p-5" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-primary uppercase tracking-widest ml-1">Software Core (.EXE)</label>
-                                        <input type="file" accept=".exe" onChange={e => setFile(e.target.files?.[0] || null)} className="w-full text-xs bg-surface-container-lowest p-6 rounded-2xl border border-white/5 border-dashed" />
-                                    </div>
-                                    <button disabled={uploadLoading} className="w-full bg-primary-container p-6 rounded-2xl font-bold text-xl shadow-[0_0_40px_rgba(37,99,235,0.4)] disabled:opacity-40">
-                                        {uploadLoading ? "Deploying..." : (editingPlan ? "Verify & Update" : "Initiate Launch")}
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === "customers" && (
-                        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <section className="space-y-6">
-                                    <h2 className="text-2xl font-headline font-bold text-yellow-400 flex items-center gap-3">Pending Requests</h2>
-                                    <div className="bg-surface-container-low rounded-[2rem] border border-white/5 overflow-hidden">
-                                        {purchases.filter(p => p.status === 'pending').length === 0 ? (
-                                            <div className="p-20 text-center text-on-surface-variant italic">No pending transactions. Monitoring active.</div>
-                                        ) : (
-                                            purchases.filter(p => p.status === 'pending').map(p => (
-                                                <div key={p.id} className="p-8 border-b border-white/5 hover:bg-white/[0.02] flex justify-between items-center group">
-                                                    <div>
-                                                        <h4 className="text-white font-bold text-lg">{p.userEmail}</h4>
-                                                        <p className="text-on-surface-variant text-sm mt-1">{p.planName} • <span className="text-primary font-bold font-mono">${p.amount}</span></p>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <button onClick={() => updatePurchaseStatus(p, "approved")} className="bg-green-500 text-white px-6 py-3 rounded-xl font-bold hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-all">Confirm</button>
-                                                        <button onClick={() => updatePurchaseStatus(p, "declined")} className="bg-surface-container-highest text-red-400 px-6 py-3 rounded-xl font-bold hover:bg-red-500/20">Decline</button>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-                                </section>
-                                <section className="space-y-6">
-                                    <h2 className="text-2xl font-headline font-bold text-green-400 flex items-center gap-3">Active Ledger</h2>
-                                    <div className="bg-surface-container-low rounded-[2rem] border border-white/5 overflow-hidden max-h-[600px] overflow-y-auto">
-                                        {purchases.filter(p => p.status === 'approved').map(p => (
-                                            <div key={p.id} className="p-8 border-b border-white/5 flex justify-between items-center opacity-70 hover:opacity-100 transition-opacity">
-                                                <div>
-                                                    <h4 className="text-white font-bold">{p.userEmail}</h4>
-                                                    <p className="text-on-surface-variant text-xs">{p.planName} • Verified</p>
-                                                </div>
-                                                <span className="text-green-400 font-bold font-mono">+${p.amount}</span>
-                                            </div>
                                         ))}
                                     </div>
-                                </section>
-                            </div>
-                        </div>
-                    )}
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] uppercase font-bold text-on-surface-variant ml-1">Features</label>
+                                    <textarea value={newPlan.features} onChange={e => setNewPlan({ ...newPlan, features: e.target.value })} className="w-full bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3 h-20" placeholder="List, features, here" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] uppercase font-bold text-on-surface-variant ml-1">Button Text</label>
+                                    <input type="text" value={newPlan.buttonText} onChange={e => setNewPlan({ ...newPlan, buttonText: e.target.value })} className="w-full bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] uppercase font-bold text-on-surface-variant ml-1">EXE File</label>
+                                    <input type="file" onChange={e => setFile(e.target.files?.[0] || null)} className="w-full text-[10px] bg-white/5 p-4 rounded-xl border-dashed border border-white/10" />
+                                </div>
+                                <button disabled={uploadLoading} className="w-full bg-primary text-white py-4 rounded-xl font-bold mt-4 hover:opacity-80 transition-all disabled:opacity-40">
+                                    {uploadLoading ? "Processing..." : (editingPlan ? "Update" : "Launch")}
+                                </button>
+                                {editingPlan && <button type="button" onClick={() => { setEditingPlan(null); setNewPlan({ name: "", price: "", description: "", features: "", buttonText: "Get Started", icon: "bolt", duration: "monthly", isPopular: false }) }} className="w-full text-xs text-on-surface-variant hover:text-white mt-2">Cancel</button>}
+                            </form>
+                        </section>
+                    </div>
+                )}
 
-                    {activeTab === "users" && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <h2 className="text-2xl font-headline font-bold flex items-center gap-3">Registered Fleet</h2>
-                            <div className="bg-surface-container-low rounded-[3rem] border border-white/5 overflow-hidden shadow-2xl">
-                                <table className="w-full text-left">
-                                    <thead className="bg-surface-container-highest border-b border-white/5">
-                                        <tr>
-                                            <th className="p-8 text-[10px] font-bold uppercase tracking-widest text-primary">Identity (Email)</th>
-                                            <th className="p-8 text-[10px] font-bold uppercase tracking-widest text-primary">Status</th>
-                                            <th className="p-8 text-[10px] font-bold uppercase tracking-widest text-primary">Onboarding Date</th>
+                {activeTab === "customers" && (
+                    <div className="grid md:grid-cols-2 gap-8 animate-in fade-in duration-300">
+                        <section className="space-y-4">
+                            <h2 className="text-sm font-bold uppercase tracking-widest text-yellow-500">Pending Requests ({purchases.filter(p => p.status === 'pending').length})</h2>
+                            <div className="bg-surface-container-low rounded-2xl border border-white/10 overflow-hidden">
+                                {purchases.filter(p => p.status === 'pending').map(p => (
+                                    <div key={p.id} className="p-6 border-b border-white/5 flex justify-between items-center text-sm">
+                                        <div>
+                                            <p className="font-bold">{p.userEmail}</p>
+                                            <p className="text-[10px] text-on-surface-variant/60">{p.planName} • ${p.amount}</p>
+                                        </div>
+                                        <div className="flex gap-1">
+                                            <button onClick={() => updatePurchaseStatus(p, "approved")} className="bg-green-500 text-white px-4 py-2 rounded-lg font-bold text-[10px] hover:opacity-80">Confirm</button>
+                                            <button onClick={() => updatePurchaseStatus(p, "declined")} className="bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-[10px] hover:opacity-80">Decline</button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                        <section className="space-y-4">
+                            <h2 className="text-sm font-bold uppercase tracking-widest text-green-500">History Ledger</h2>
+                            <div className="bg-surface-container-low rounded-2xl border border-white/10 overflow-hidden text-sm">
+                                {purchases.filter(p => p.status !== 'pending').map(p => (
+                                    <div key={p.id} className="p-6 border-b border-white/5 flex justify-between items-center opacity-60">
+                                        <p>{p.userEmail} <br /><span className="text-[10px] font-bold">{p.planName}</span></p>
+                                        <span className={`text-[9px] font-bold uppercase ${p.status === 'approved' ? 'text-green-400' : 'text-red-400'}`}>{p.status}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    </div>
+                )}
+
+                {activeTab === "users" && (
+                    <section className="animate-in fade-in duration-300">
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-primary mb-6">User Registry ({usersList.length})</h2>
+                        <div className="bg-surface-container-low rounded-3xl border border-white/10 overflow-hidden text-sm">
+                            <table className="w-full text-left">
+                                <thead className="bg-white/5 text-[10px] font-bold uppercase text-on-surface-variant">
+                                    <tr>
+                                        <th className="px-6 py-4">Account Email</th>
+                                        <th className="px-6 py-4">Status</th>
+                                        <th className="px-6 py-4">Registered Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {usersList.map((u) => (
+                                        <tr key={u.id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                                            <td className="px-6 py-4 font-medium">{u.email}</td>
+                                            <td className="px-6 py-4 text-[10px]"><span className="bg-green-500/10 text-green-400 px-2 py-1 rounded-full border border-green-500/20 font-bold uppercase">Authorized</span></td>
+                                            <td className="px-6 py-4 text-xs opacity-60">{u.createdAt ? new Date(u.createdAt.seconds * 1000).toLocaleDateString() : "Old System"}</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {usersList.map((u, i) => (
-                                            <tr key={u.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                                                <td className="p-8 font-bold text-lg">{u.email}</td>
-                                                <td className="p-8">
-                                                    <span className="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-[10px] font-bold uppercase">Authorized</span>
-                                                </td>
-                                                <td className="p-8 text-on-surface-variant text-sm italic">{u.createdAt ? new Date(u.createdAt.seconds * 1000).toLocaleDateString() : "Historical"}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
-                    )}
+                    </section>
+                )}
 
-                    {activeTab === "financials" && (
-                        <div className="grid lg:grid-cols-12 gap-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="lg:col-span-8 space-y-12">
-                                <h2 className="text-4xl font-headline font-extrabold tracking-tighter">Financial Pulse</h2>
-                                <div className="grid md:grid-cols-2 gap-8">
-                                    <div className="bg-surface-container-high/60 p-10 rounded-[3rem] border border-white/10 flex flex-col justify-between">
-                                        <span className="material-symbols-outlined text-green-400 text-6xl mb-6">point_of_sale</span>
-                                        <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-on-surface-variant">Gross Profit</p>
-                                            <h3 className="text-6xl font-headline font-extrabold mt-2 tracking-tighter">${totalRevenue}</h3>
-                                        </div>
-                                    </div>
-                                    <div className="bg-surface-container-high/60 p-10 rounded-[3rem] border border-white/10 flex flex-col justify-between">
-                                        <span className="material-symbols-outlined text-primary text-6xl mb-6">shopping_cart_checkout</span>
-                                        <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-on-surface-variant">Total Transactions</p>
-                                            <h3 className="text-6xl font-headline font-extrabold mt-2 tracking-tighter">{purchases.filter(p => p.status === 'approved').length}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="bg-surface-container-low p-12 rounded-[3.5rem] border border-white/5 overflow-hidden">
-                                    <h3 className="text-xl font-bold mb-8">System Allocation (Plan Popularity)</h3>
-                                    <div className="space-y-6">
-                                        {plans.map(p => {
-                                            const count = purchases.filter(purch => purch.planId === p.id && purch.status === 'approved').length
-                                            const percentage = (count / (purchases.filter(purch => purch.status === 'approved').length || 1)) * 100
-                                            return (
-                                                <div key={p.id} className="space-y-2">
-                                                    <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-                                                        <span>{p.name}</span>
-                                                        <span>{count} Units Sold</span>
-                                                    </div>
-                                                    <div className="w-full h-3 bg-surface-container-lowest rounded-full overflow-hidden">
-                                                        <div className="h-full bg-primary" style={{ width: `${percentage}%` }}></div>
-                                                    </div>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="lg:col-span-4 bg-primary/5 rounded-[3rem] border border-primary/20 p-10 flex flex-col justify-center items-center text-center space-y-6">
-                                <span className="material-symbols-outlined text-8xl text-primary animate-pulse">monitoring</span>
-                                <h3 className="text-2xl font-headline font-bold">Strategy Vision</h3>
-                                <p className="text-on-surface-variant text-sm italic">"Financial optimization is the bedrock of industrial automation."</p>
-                                <div className="w-full pt-10 border-t border-white/5">
-                                    <div className="text-primary font-bold text-lg">Next Quarter Target</div>
-                                    <div className="text-4xl font-headline font-extrabold mt-2">$250,000</div>
-                                </div>
-                            </div>
+                {activeTab === "financials" && (
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
+                        <div className="bg-surface-container-high/60 p-8 rounded-3xl border border-white/5 text-center">
+                            <p className="text-[10px] font-bold uppercase text-on-surface-variant mb-2">Total Profits</p>
+                            <h3 className="text-4xl font-headline font-extrabold text-white tracking-tighter">${totalRevenue}</h3>
                         </div>
-                    )}
-                </div>
+                        <div className="bg-surface-container-high/60 p-8 rounded-3xl border border-white/5 text-center">
+                            <p className="text-[10px] font-bold uppercase text-on-surface-variant mb-2">Sales Volume</p>
+                            <h3 className="text-4xl font-headline font-extrabold text-white tracking-tighter">{purchases.filter(p => p.status === 'approved').length}</h3>
+                        </div>
+                        <div className="bg-surface-container-high/60 p-8 rounded-3xl border border-white/5 text-center">
+                            <p className="text-[10px] font-bold uppercase text-on-surface-variant mb-2">Registered Base</p>
+                            <h3 className="text-4xl font-headline font-extrabold text-white tracking-tighter">{usersList.length}</h3>
+                        </div>
+                    </div>
+                )}
             </div>
             <Footer />
         </main>
     )
 }
 
-function StatBox({ label, value, icon, color }: any) {
+function TabBtn({ active, onClick, icon, label }: any) {
     return (
-        <div className="bg-surface-container-high/20 p-6 rounded-3xl border border-white/5 flex items-center gap-6 min-w-[220px] group hover:bg-white/[0.03] transition-all">
-            <div className={`w-14 h-14 rounded-2xl bg-${color}/10 border border-${color}/20 flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                <span className={`material-symbols-outlined text-3xl text-${color}`}>{icon}</span>
-            </div>
-            <div>
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant">{label}</div>
-                <div className="text-3xl font-headline font-extrabold text-white tracking-tighter">{value}</div>
-            </div>
-        </div>
-    )
-}
-
-function TabButton({ active, onClick, icon, label }: any) {
-    return (
-        <button onClick={onClick} className={`px-8 py-4 rounded-2xl flex items-center gap-3 font-bold transition-all ${active ? 'bg-primary text-white shadow-xl scale-105' : 'text-on-surface-variant hover:text-white hover:bg-white/5'}`}>
-            <span className="material-symbols-outlined text-lg">{icon}</span>
+        <button onClick={onClick} className={`px-5 py-2 rounded-xl flex items-center gap-2 font-bold mb-0 text-[11px] transition-all ${active ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-white/5 hover:text-white'}`}>
+            <span className="material-symbols-outlined text-sm">{icon}</span>
             {label}
         </button>
     )
