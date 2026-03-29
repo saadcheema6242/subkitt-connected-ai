@@ -11,6 +11,9 @@ export default function Header() {
     const router = useRouter()
     const [user] = useAuthState(auth)
 
+    const ADMIN_EMAIL = "muhammadsaadc49@gmail.com"
+    const isAdmin = user?.email === ADMIN_EMAIL
+
     const navLinks = [
         { name: "Features", href: "/features" },
         { name: "How It Works", href: "/how-it-works" },
@@ -21,7 +24,7 @@ export default function Header() {
 
     const handleDownloadClick = () => {
         if (!user) router.push("/login")
-        else router.push("/dashboard")
+        else router.push(isAdmin ? "/dashboard/admin" : "/dashboard")
     }
 
     return (
@@ -41,7 +44,7 @@ export default function Header() {
                     ))}
                     {user && (
                         <Link
-                            href="/dashboard"
+                            href={isAdmin ? "/dashboard/admin" : "/dashboard"}
                             className={`transition-colors text-base ${pathname.startsWith('/dashboard') ? 'text-primary border-b-2 border-primary-container pb-1' : 'text-on-surface-variant hover:text-white'}`}
                         >
                             Dashboard
@@ -59,7 +62,7 @@ export default function Header() {
                         onClick={handleDownloadClick}
                         className="bg-primary-container text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:shadow-[0_0_15px_rgba(37,99,235,0.3)] transition-all duration-300 scale-95 active:scale-90"
                     >
-                        Download Free
+                        {isAdmin ? "Manage App" : "Download Free"}
                     </button>
                 </div>
             </nav>
