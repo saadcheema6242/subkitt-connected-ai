@@ -50,38 +50,22 @@ export default function DashboardPage() {
         if (!user || !showStripe) return
 
         setIsCheckingOut(true)
-        // Simulate Stripe API delay
         setTimeout(async () => {
-            // Create purchase request in Firestore
             await addDoc(collection(db, "purchases"), {
                 userId: user.uid,
                 userEmail: user.email,
                 planId: showStripe.id,
                 planName: showStripe.name,
-                status: "pending", // Admin must approve
+                status: "pending",
                 timestamp: serverTimestamp(),
                 amount: showStripe.price,
                 currency: "USD",
                 paymentMethod: "Stripe"
             })
 
-            // Notify admin
-            try {
-                await fetch('/api/notify', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userEmail: user.email,
-                        planName: showStripe.name,
-                        price: showStripe.price,
-                        type: 'admin'
-                    })
-                });
-            } catch (e) { }
-
             setIsCheckingOut(false)
             setShowStripe(null)
-            alert(`Payment Successful! Your access for ${showStripe.name} is being provisioned. Please wait for the admin to verify the transaction.`)
+            alert(`Payment Successful! Your access for ${showStripe.name} is being provisioned.`)
         }, 2000)
     }
 
@@ -91,55 +75,45 @@ export default function DashboardPage() {
         <main className="min-h-screen flex flex-col pt-44 px-8 max-w-7xl mx-auto w-full bg-background">
             <Header />
 
-            <div className="flex flex-col md:flex-row justify-between items-start mb-16 gap-6">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-16 gap-6 border-l-4 border-primary pl-6">
                 <div>
-                    <h1 className="text-5xl font-headline font-extrabold text-white mb-3 tracking-tighter">Welcome, {user?.email?.split("@")[0]}</h1>
-                    <p className="text-on-surface-variant font-body text-lg italic opacity-75">"Synchronizing your creative ambition with technical reality."</p>
+                    <h1 className="text-5xl font-headline font-extrabold text-white mb-3 tracking-tighter uppercase leading-[0.8]">Systems Online, {user?.email?.split("@")[0]}</h1>
+                    <p className="text-on-surface-variant font-body text-lg italic opacity-75">Operational status: <span className="text-secondary-container not-italic font-bold">OPTIMAL</span></p>
                 </div>
                 <div className="flex gap-4">
                     {isAdmin && (
-                        <button
-                            onClick={() => router.push("/dashboard/admin")}
-                            className="bg-primary-container text-white border border-primary/30 px-8 py-3 rounded-2xl font-bold hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all flex items-center gap-2"
-                        >
-                            <span className="material-symbols-outlined">shield_person</span> Admin Control
+                        <button onClick={() => router.push("/dashboard/admin")} className="bg-primary-container text-white px-8 py-3 rounded-2xl font-bold flex items-center gap-2 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all">
+                            <span className="material-symbols-outlined">shield_person</span> Admin Hub
                         </button>
                     )}
-                    <button
-                        onClick={() => auth.signOut()}
-                        className="bg-surface-container-high text-white px-8 py-3 rounded-2xl font-bold hover:bg-white/10 transition-all border border-white/5"
-                    >
-                        Sign Out
-                    </button>
+                    <button onClick={() => auth.signOut()} className="bg-surface-container-high text-on-surface-variant px-8 py-3 rounded-2xl font-bold hover:bg-white hover:text-black transition-all border border-white/5">Sign Out</button>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-32">
-                {/* My Active Gear (Purchased) */}
+                {/* Active Gear */}
                 <div className="lg:col-span-4 space-y-8">
-                    <h2 className="text-2xl font-headline font-bold text-white flex items-center gap-2">
-                        <span className="material-symbols-outlined text-primary">download_done</span> Your Licenses
+                    <h2 className="text-2xl font-headline font-bold text-white flex items-center gap-3">
+                        <span className="material-symbols-outlined text-primary">verified</span> Deployment Fleet
                     </h2>
                     <div className="space-y-4">
                         {purchases.length === 0 ? (
-                            <div className="bg-surface-container-low p-10 rounded-3xl border border-outline-variant/10 text-center text-on-surface-variant italic">
-                                No active licenses found. <br /> Browse available gear.
-                            </div>
+                            <div className="bg-surface-container-low p-12 rounded-[2.5rem] border border-white/5 text-center text-on-surface-variant italic">No deployed tech found.</div>
                         ) : (
                             purchases.map((p) => (
-                                <div key={p.id} className="bg-surface-container-high/40 p-6 rounded-2xl border border-outline-variant/15 relative overflow-hidden group">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h3 className="text-white font-bold">{p.planName}</h3>
-                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest ${p.status === 'approved' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                                <div key={p.id} className="bg-surface-container-high/40 p-8 rounded-[2rem] border border-white/10 relative overflow-hidden group hover:border-primary/40 transition-all">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="text-white font-bold text-xl">{p.planName}</h3>
+                                        <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest ${p.status === 'approved' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                                             {p.status}
                                         </span>
                                     </div>
                                     {p.status === 'approved' ? (
-                                        <a href={p.fileUrl} className="w-full bg-white text-black py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all">
-                                            <span className="material-symbols-outlined">download</span> Download EXE
+                                        <a href={p.fileUrl} className="w-full bg-primary text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white hover:text-black transition-all">
+                                            <span className="material-symbols-outlined">download</span> Get Core EXE
                                         </a>
                                     ) : (
-                                        <div className="text-[11px] text-on-surface-variant font-mono bg-surface-container-lowest p-3 rounded-lg text-center opacity-60">ADMIN VERIFICATION PENDING</div>
+                                        <div className="text-[10px] text-on-surface-variant/60 font-mono bg-surface-container-lowest p-4 rounded-xl text-center border border-white/5">AUTHENTICATING...</div>
                                     )}
                                 </div>
                             ))
@@ -147,29 +121,36 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* Marketplace (All Plans) */}
+                {/* Marketplace */}
                 <div className="lg:col-span-8 space-y-8">
-                    <h2 className="text-2xl font-headline font-bold text-white flex items-center gap-2">
-                        <span className="material-symbols-outlined text-primary">shopping_bag</span> Gear Store
+                    <h2 className="text-2xl font-headline font-bold text-white flex items-center gap-3">
+                        <span className="material-symbols-outlined text-primary">dynamic_feed</span> Infrastructure Marketplace
                     </h2>
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid md:grid-cols-2 gap-8">
                         {plans.map((plan) => (
-                            <div key={plan.id} className="bg-surface-container-high/60 backdrop-blur-xl p-8 rounded-[2.5rem] border border-outline-variant/20 hover:border-primary/40 transition-all flex flex-col justify-between group h-full">
+                            <div key={plan.id} className="bg-surface-container-high/60 backdrop-blur-xl p-10 rounded-[3rem] border border-white/10 transition-all flex flex-col justify-between group h-full relative overflow-hidden">
+                                {plan.isPopular && <div className="absolute top-6 right-6 text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full">Popular</div>}
                                 <div>
-                                    <h3 className="text-2xl font-headline font-extrabold text-white mb-2">{plan.name}</h3>
-                                    <p className="text-on-surface-variant text-sm leading-relaxed mb-6">{plan.description}</p>
-                                </div>
-                                <div className="pt-6 border-t border-white/5 space-y-6">
-                                    <div className="flex items-end gap-1">
-                                        <span className="text-3xl font-bold text-white">${plan.price}</span>
-                                        <span className="text-on-surface-variant text-xs mb-1">/ lifetime</span>
+                                    <div className="flex items-center gap-4 mb-6">
+                                        <span className="material-symbols-outlined text-4xl text-primary">{plan.icon || 'bolt'}</span>
+                                        <h3 className="text-2xl font-headline font-extrabold text-white tracking-tight">{plan.name}</h3>
                                     </div>
-                                    <button
-                                        onClick={() => setShowStripe(plan)}
-                                        className="w-full bg-primary-container text-white py-4 rounded-2xl font-bold hover:shadow-[0_0_25px_rgba(124,58,237,0.4)] transition-all flex items-center justify-center gap-2"
-                                    >
-                                        Upgrade Now
-                                        <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                                    <p className="text-on-surface-variant text-sm leading-relaxed mb-8 italic opacity-80">{plan.description}</p>
+                                    <ul className="space-y-3 mb-10">
+                                        {plan.features?.slice(0, 4).map((f: string, i: number) => (
+                                            <li key={i} className="flex items-center gap-3 text-xs text-on-surface-variant">
+                                                <span className="material-symbols-outlined text-green-400 text-sm">check_circle</span> {f}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                <div className="pt-8 border-t border-white/5 flex flex-col gap-6">
+                                    <div className="flex items-end gap-1">
+                                        <span className="text-4xl font-extrabold text-white tracking-tighter">${plan.price}</span>
+                                        <span className="text-on-surface-variant text-xs mb-1 italic opacity-60">/ {plan.duration}</span>
+                                    </div>
+                                    <button onClick={() => setShowStripe(plan)} className="w-full bg-white text-black py-5 rounded-2xl font-bold text-lg hover:bg-primary hover:text-white transition-all shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
+                                        {plan.buttonText || 'Upgrade Now'}
                                     </button>
                                 </div>
                             </div>
@@ -178,51 +159,32 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* MOCK STRIPE MODAL */}
+            {/* MOCK STRIPE MODAL (Remains similar but themed) */}
             {showStripe && (
-                <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-[#f6f9fc] w-full max-w-lg rounded-[2rem] overflow-hidden shadow-2xl relative animate-in fade-in zoom-in duration-300">
-                        {/* Stripe Header */}
-                        <div className="bg-[#6772e5] p-10 text-white relative">
-                            <button onClick={() => setShowStripe(null)} className="absolute top-6 right-6 opacity-60 hover:opacity-100">
-                                <span className="material-symbols-outlined">close</span>
+                <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-6">
+                    <div className="bg-[#f6f9fc] w-full max-w-xl rounded-[3rem] overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.5)] relative animate-in fade-in zoom-in duration-500">
+                        <div className="bg-[#6772e5] p-12 text-white relative">
+                            <button onClick={() => setShowStripe(null)} className="absolute top-8 right-8 text-white/60 hover:text-white">
+                                <span className="material-symbols-outlined text-3xl">close</span>
                             </button>
-                            <div className="flex items-center gap-3 mb-4 opacity-80">
-                                <span className="material-symbols-outlined text-xl">blur_on</span>
-                                <span className="text-sm font-bold tracking-[0.2em] uppercase">SubKitt AI Pay</span>
-                            </div>
-                            <h2 className="text-4xl font-headline font-bold">${showStripe.price}.00</h2>
-                            <p className="opacity-80 mt-1">One-time license for {showStripe.name}</p>
+                            <h2 className="text-5xl font-headline font-bold mb-2">${showStripe.price}.00</h2>
+                            <p className="opacity-80 text-lg uppercase tracking-widest font-bold text-xs">{showStripe.name} Deployment</p>
                         </div>
-
-                        {/* Stripe Body */}
-                        <div className="p-10 text-[#424770] font-manrope">
-                            <form onSubmit={handleStripeCheckout} className="space-y-6">
-                                <div>
-                                    <label className="text-[11px] font-bold uppercase tracking-wider text-[#6b7c93] mb-2 block">Card Information</label>
-                                    <div className="bg-white border rounded-xl p-4 shadow-sm space-y-4">
-                                        <input type="text" placeholder="Card number" required className="w-full text-lg outline-none placeholder:text-[#cfd7df]" />
-                                        <div className="flex gap-4 border-t pt-4">
-                                            <input type="text" placeholder="MM / YY" required className="w-1/2 text-lg outline-none placeholder:text-[#cfd7df]" />
-                                            <input type="text" placeholder="CVC" required className="w-1/2 text-lg outline-none placeholder:text-[#cfd7df]" />
+                        <div className="p-12">
+                            <form onSubmit={handleStripeCheckout} className="space-y-8">
+                                <div className="space-y-4">
+                                    <div className="bg-white border-2 border-slate-100 rounded-2xl p-6 shadow-sm">
+                                        <input type="text" placeholder="Card number" required className="w-full text-xl outline-none" />
+                                        <div className="flex gap-4 border-t-2 mt-6 pt-6">
+                                            <input type="text" placeholder="MM / YY" required className="w-1/2 text-xl outline-none" />
+                                            <input type="text" placeholder="CVC" required className="w-1/2 text-xl outline-none" />
                                         </div>
                                     </div>
+                                    <input type="text" placeholder="Cardholder Name" required className="w-full bg-white border-2 border-slate-100 rounded-2xl p-6 text-xl outline-none shadow-sm" />
                                 </div>
-                                <div>
-                                    <label className="text-[11px] font-bold uppercase tracking-wider text-[#6b7c93] mb-2 block">Cardholder Name</label>
-                                    <input type="text" placeholder="Full name on card" required className="w-full bg-white border rounded-xl p-4 text-lg outline-none placeholder:text-[#cfd7df] shadow-sm" />
-                                </div>
-                                <button
-                                    disabled={isCheckingOut}
-                                    className="w-full bg-[#32325d] text-white py-5 rounded-xl font-bold text-lg hover:bg-[#242447] transition-all shadow-lg flex items-center justify-center gap-3"
-                                >
-                                    {isCheckingOut ? (
-                                        <>Proccessing...</>
-                                    ) : (
-                                        <>Pay Now</>
-                                    )}
+                                <button disabled={isCheckingOut} className="w-full bg-[#32325d] text-white py-6 rounded-2xl font-bold text-xl hover:bg-black transition-all shadow-xl">
+                                    {isCheckingOut ? "Connecting to Bank..." : `Pay $${showStripe.price}`}
                                 </button>
-                                <p className="text-center text-[10px] text-[#6b7c93]">Your transaction is secured by Stripe. Encryption active.</p>
                             </form>
                         </div>
                     </div>
