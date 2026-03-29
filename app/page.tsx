@@ -18,7 +18,7 @@ export default function Home() {
   }, [])
 
   return (
-    <main className="min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col bg-background">
       <Header />
 
       {/* Hero Section */}
@@ -72,41 +72,43 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Dashboard Preview */}
-      <section className="py-24 px-8 max-w-7xl mx-auto relative overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary-container/10 blur-[120px] rounded-full"></div>
-        <div className="grid lg:grid-cols-2 gap-20 items-center">
-          <div className="space-y-6">
-            <h2 className="text-4xl md:text-6xl font-headline font-extrabold text-white leading-tight">Visualizing <br />Intelligence.</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <ScheduleCard emoji="☕" type="DAILY" title="Morning Prep" time="08:00 AM" />
-              <ScheduleCard emoji="🧹" type="WEEKLY" title="Cache Cleanup" time="Fri, 11:00 PM" active />
-              <ScheduleCard emoji="📸" type="MONTHLY" title="Cloud Backup" time="1st, 12:00 AM" />
-              <ScheduleCard emoji="💬" type="ACTIVE" title="Auto-Reply" time="Slack Status" />
+      {/* Case Studies Restored */}
+      <section className="py-24 bg-surface relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+            <div className="max-w-2xl">
+              <h2 className="text-4xl md:text-6xl font-headline font-extrabold text-white leading-tight">Mastering <br /> Complexity.</h2>
+              <p className="text-on-surface-variant mt-6 text-lg">Real-world systems optimized by the SubKitt autonomous core.</p>
             </div>
+            <Link href="/features" className="text-primary font-bold flex items-center gap-2 hover:gap-4 transition-all">
+              View all capabilities <span className="material-symbols-outlined">arrow_right_alt</span>
+            </Link>
           </div>
-          <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/10 shadow-xl">
-            <div className="flex justify-between items-center mb-8">
-              <h3 className="font-headline font-bold text-white">Timeline Preview</h3>
-              <span className="material-symbols-outlined text-primary">more_horiz</span>
-            </div>
-            <div className="space-y-8 relative">
-              <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-outline-variant/20"></div>
-              <TimelineItem status="NOW RUNNING" title="System Optimization" desc="Cleaning browser temporary files..." active />
-              <TimelineItem status="UP NEXT (12:00 PM)" title="Lunch Break Protocol" desc="Muting notifications and setting status" />
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <CaseStudyCard
+              title="Automated Data Pipeline"
+              client="Visionary Tech"
+              desc="Reduced manual processing time by 82% using logic chaining and AI summarization."
+              tag="DATAVIZ"
+            />
+            <CaseStudyCard
+              title="DevOps Orchestration"
+              client="Nexus Cloud"
+              desc="Consolidated 14 disparate tools into a single terminal window with 100% cloud sync."
+              tag="INFRA"
+            />
           </div>
         </div>
       </section>
 
       {/* Workflow Chains */}
-      <section className="py-24 relative overflow-hidden">
+      <section className="py-24 relative overflow-hidden bg-surface-container-low/30">
         <div className="absolute inset-0 z-0">
           <img className="w-full h-full object-cover opacity-12 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_0GHbR5jS9vXndG0D-gTWdBx5Pax1TN6lAQP3AsA97kKSCWO_7I-ym0Ld67KtuVNSMvIhHcLachpmOlkgvjoF4Zyz8i0BcmGNXtSurraYIUoXos1a5vCENxoGJWJ8R-YpUkhg9_rl1G5icsktKL8taQXK2UaSYQ2dMlVr2n_CyfhGASPAx6gi5iFw-F5lZrAo0crKZh_GOPrBKoU-qyaqSOlEw9mMb8Js_qlGyBbB_qk_-vTmwhBTZPVTlRuNL2w7cZLeyP-LWEc" alt="Chains Background" />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-8 flex flex-col lg:flex-row-reverse items-center gap-16">
           <div className="lg:w-1/2 space-y-8">
-            <h2 className="text-5xl font-headline font-extrabold text-white">Chain Actions. Build Workflows.</h2>
+            <h2 className="text-5xl font-headline font-extrabold text-white">Chain Actions. <br /> Build Workflows.</h2>
             <ul className="space-y-6">
               <li className="flex gap-4">
                 <span className="material-symbols-outlined text-primary">link</span>
@@ -125,17 +127,17 @@ export default function Home() {
             </ul>
           </div>
           <div className="lg:w-1/2 w-full">
-            <div className="bg-[#0E0E13] rounded-2xl border border-primary/20 p-6 font-mono text-sm overflow-hidden">
-              <div className="flex items-center gap-2 mb-6 text-on-surface-variant/40 text-xs">
+            <div className="bg-[#0E0E13] rounded-2xl border border-primary/20 p-8 font-mono text-sm overflow-hidden shadow-2xl">
+              <div className="flex items-center gap-2 mb-8 text-on-surface-variant/40 text-[10px] tracking-wider">
                 <span>WORKFLOW_EDITOR</span>
                 <span className="w-px h-3 bg-white/10"></span>
                 <span>prod_v1.sh</span>
               </div>
-              <div className="space-y-6">
+              <div className="space-y-8">
                 <EditorStep num={1} code="read_calendar --today" color="primary-fixed" />
-                <div className="ml-4 h-10 w-0.5 bg-gradient-to-b from-primary-container to-secondary-container"></div>
+                <div className="ml-4 h-12 w-0.5 bg-gradient-to-b from-primary-container to-secondary-container opacity-40"></div>
                 <EditorStep num={2} code="ai summarize_events $calendar_output" color="white" bgColor="secondary-container" />
-                <div className="ml-4 h-10 w-0.5 bg-gradient-to-b from-secondary-container to-primary"></div>
+                <div className="ml-4 h-12 w-0.5 bg-gradient-to-b from-secondary-container to-primary opacity-40"></div>
                 <EditorStep num={3} code="slack send --to #daily-brief --msg $ai_summary" color="primary-fixed" bgColor="primary" />
               </div>
             </div>
@@ -143,27 +145,48 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Testimonials Restored */}
+      <section className="py-24 bg-surface relative">
+        <div className="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <TestimonialCard
+            quote="The speed is terrifying. In a good way. My productivity has quadrupled."
+            author="Sarah Jenkins"
+            role="Principal Engineer @ CloudFlare"
+          />
+          <TestimonialCard
+            quote="Finally, a terminal that understands my intent. It's like having a senior dev in my CLI."
+            author="Marcus Chen"
+            role="Full Stack Dev @ Stripe"
+          />
+          <TestimonialCard
+            quote="Encrypted sync meant I could finally trust my workflows across my entire fleet."
+            author="David Kim"
+            role="Security Lead @ Brex"
+          />
+        </div>
+      </section>
+
       {/* Pricing Section (Dynamic) */}
-      <section className="py-24 relative overflow-hidden">
+      <section className="py-24 relative overflow-hidden bg-surface-container-low/20">
         <div className="absolute inset-0 z-0">
           <img className="w-full h-full object-cover opacity-15 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcUNGh7rbGAyeiC2GUrrgWsTvgx-lLahXi5iKC6ednK6iHJELjZnIsFqaYT3lRtCuyhoN0g8Ax4pL0zEn1BAuMOu_CGNdnhmo9LG-2C1q9-6WrHr7kUCd0MN8MPo8Qg7rXQULxcW96gUSul5jRH2nJJKIMmQW_uoOR26sCfS7BoLBw1CFmIKxpYyTzijHA4hqU3b-F4jJ8LhE7xxg8ENu7E8WQfDqqdZ5A2kOzv1JHPWD2lvVLV4FmGw_eYVcplYUx3lrVbR8AFHs" alt="Pricing Background" />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-headline font-bold text-white">Pricing for Everyone</h2>
-            <p className="text-on-surface-variant mt-4 font-body">Choose the core that fits your vision.</p>
+          <div className="text-center mb-20">
+            <h2 className="text-5xl font-headline font-extrabold text-white">Scale your <span className="text-primary-variant">Ambition.</span></h2>
+            <p className="text-on-surface-variant mt-4 font-body text-lg italic">Choose the core license that powers your workflow.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {plans.length === 0 ? (
               <div className="col-span-full py-20 text-center bg-surface-container-high/20 rounded-3xl border border-outline-variant/10">
-                <p className="text-on-surface-variant italic">New plans arriving in the dashboard space soon.</p>
+                <p className="text-on-surface-variant italic">Waiting for admin to deploy core licenses...</p>
               </div>
             ) : (
               plans.map((plan) => (
                 <PricingCard key={plan.id} title={plan.name} price={`$${plan.price}`} subtitle="/ lifetime">
-                  <p className="text-on-surface-variant text-sm mb-6 leading-relaxed">{plan.description}</p>
-                  <Link href="/login" className="block w-full text-center bg-primary-container text-white py-4 rounded-xl font-bold hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all">
-                    Get Started
+                  <p className="text-on-surface-variant text-sm mb-8 leading-relaxed italic border-l-2 border-primary/20 pl-4">{plan.description}</p>
+                  <Link href="/login" className="block w-full text-center bg-primary-container text-white py-5 rounded-2xl font-bold hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all active:scale-95">
+                    Acquire License
                   </Link>
                 </PricingCard>
               ))
@@ -173,22 +196,14 @@ export default function Home() {
       </section>
 
       {/* Download CTA */}
-      <section className="py-32 bg-surface-container-lowest relative overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img className="w-full h-full object-cover opacity-20 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAH1pCKdrs_REZMCCiaRIicqUhSwve5sgeRB1GtarjxAjnuvec6EjxPopzy2KJF-4VFwixxlFOd7HlSXskvwqWTp0Izfinuq0wUJTXrw5aMKT3VqvVjCVd6VbRf5n4HZE6K5HYMcUYWAwuOMfdL8-0k2eOKGvNPZ0UMO3KUHVWDqcYud0iGRGGxegSEux8m9EwWGXvnbUUE7GMx0AFVy32Dfb-knEOqGwCKp9Jhy0EeXPTVc4CYIALq66TOpA8bWoN4sdA6peUmWL4" alt="CTA Background" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
-        </div>
-        <div className="relative z-10 max-w-4xl mx-auto px-8 text-center space-y-10">
-          <h2 className="text-6xl font-headline font-extrabold text-white">Ready to take control?</h2>
-          <p className="text-xl text-on-surface-variant">Join 45,000+ power users and transform your desktop experience today.</p>
+      <section className="py-32 bg-surface-container-lowest relative overflow-hidden text-center">
+        <div className="max-w-4xl mx-auto px-8 space-y-12">
+          <h2 className="text-6xl md:text-8xl font-headline font-extrabold text-white tracking-tighter">JOIN THE <br />REVOLUTION.</h2>
+          <p className="text-xl text-on-surface-variant opacity-80">Synchronize your creative ambition with technical reality today.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <Link href="/download" className="bg-primary-container text-white px-12 py-5 rounded-2xl font-bold text-xl shadow-[0_0_40px_rgba(37,99,235,0.4)] hover:scale-105 transition-transform inline-flex items-center justify-center">
-              Download for Windows
+            <Link href="/download" className="bg-primary-container text-white px-16 py-6 rounded-2xl font-bold text-xl shadow-[0_0_50px_rgba(37,99,235,0.4)] hover:scale-105 transition-transform inline-flex items-center justify-center">
+              Download Core
             </Link>
-            <div className="text-on-surface-variant/40 text-sm flex items-center justify-center gap-2">
-              <span className="material-symbols-outlined text-xs">info</span>
-              Also available for macOS and Linux (Beta)
-            </div>
           </div>
         </div>
       </section>
@@ -200,50 +215,52 @@ export default function Home() {
 
 function FeatureCard({ icon, title, desc, img }: any) {
   return (
-    <div className="bg-surface-container-high/40 backdrop-blur-md rounded-xl p-6 border border-outline-variant/10 hover:bg-surface-container-high transition-all group">
-      <div className="w-12 h-12 rounded-lg bg-primary-container/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-        <span className="material-symbols-outlined text-primary">{icon}</span>
+    <div className="bg-surface-container-high/40 backdrop-blur-md rounded-2xl p-8 border border-outline-variant/10 hover:bg-surface-container-high transition-all group">
+      <div className="w-14 h-14 rounded-xl bg-primary-container/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+        <span className="material-symbols-outlined text-primary text-3xl">{icon}</span>
       </div>
-      <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-      <p className="text-on-surface-variant text-sm mb-4">{desc}</p>
-      <img className="w-full h-24 object-cover rounded-lg opacity-40 group-hover:opacity-60 transition-opacity" src={img} alt={title} />
+      <h3 className="text-2xl font-bold text-white mb-3">{title}</h3>
+      <p className="text-on-surface-variant text-base mb-6 leading-relaxed opacity-80">{desc}</p>
+      <img className="w-full h-32 object-cover rounded-xl opacity-20 grayscale group-hover:opacity-40 transition-opacity" src={img} alt={title} />
     </div>
   )
 }
 
-function ScheduleCard({ emoji, type, title, time, active }: any) {
+function CaseStudyCard({ title, client, desc, tag }: any) {
   return (
-    <div className={`p-4 rounded-xl border ${active ? 'bg-primary/10 border-primary/30 shadow-[0_0_20px_rgba(37,99,235,0.15)]' : 'bg-surface-container-low border-white/5'} transition-all hover:scale-105`}>
-      <div className="flex justify-between items-start mb-2">
-        <span className="text-xl">{emoji}</span>
-        <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${active ? 'bg-primary text-white' : 'bg-white/10 text-on-surface-variant'}`}>{type}</span>
+    <div className="bg-surface-container-low p-8 rounded-3xl border border-white/5 hover:border-primary/40 transition-all group cursor-default">
+      <div className="flex justify-between mb-8">
+        <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary px-3 py-1 bg-primary/10 rounded-full">{tag}</span>
+        <span className="text-on-surface-variant text-xs font-mono">{client}</span>
       </div>
-      <div className="text-white font-bold text-xs">{title}</div>
-      <div className="text-on-surface-variant text-[10px] mt-1">{time}</div>
+      <h3 className="text-2xl font-headline font-bold text-white mb-4 group-hover:text-primary transition-colors">{title}</h3>
+      <p className="text-on-surface-variant leading-relaxed">{desc}</p>
     </div>
   )
 }
 
-function TimelineItem({ status, title, desc, active }: any) {
+function TestimonialCard({ quote, author, role }: any) {
   return (
-    <div className="relative pl-10 group">
-      <div className={`absolute left-4 top-1 w-2 h-2 rounded-full transform -translate-x-1/2 z-10 transition-all ${active ? 'bg-primary shadow-[0_0_10px_rgba(37,99,235,0.8)] scale-125' : 'bg-outline-variant/40 group-hover:bg-primary/60'}`}></div>
-      <div className="text-[9px] font-bold text-primary tracking-widest mb-1">{status}</div>
-      <h4 className="text-white font-bold text-sm">{title}</h4>
-      <p className="text-on-surface-variant text-xs mt-1 leading-relaxed">{desc}</p>
+    <div className="bg-surface-container-high/20 p-8 rounded-3xl border border-white/5 relative group">
+      <span className="material-symbols-outlined text-primary/20 text-6xl absolute top-4 right-4 group-hover:text-primary/40 transition-colors">format_quote</span>
+      <p className="text-white text-lg font-medium leading-relaxed mb-8 italic relative z-10">"{quote}"</p>
+      <div className="pt-6 border-t border-white/5">
+        <div className="text-white font-bold">{author}</div>
+        <div className="text-on-surface-variant text-xs mt-1">{role}</div>
+      </div>
     </div>
   )
 }
 
 function EditorStep({ num, code, color, bgColor }: any) {
   return (
-    <div className="flex items-center gap-4 group">
-      <div className={`w-8 h-8 rounded-lg ${bgColor ? `bg-${bgColor}/20` : 'bg-surface-container-high'} border border-${color}/20 flex items-center justify-center font-bold text-xs text-${color} group-hover:scale-110 transition-transform`}>
+    <div className="flex items-center gap-6 group">
+      <div className={`w-10 h-10 rounded-xl ${bgColor ? `bg-${bgColor}/20` : 'bg-surface-container-high'} border border-${color}/20 flex items-center justify-center font-bold text-sm text-${color} group-hover:scale-110 shadow-lg transition-transform`}>
         {num}
       </div>
-      <div className="bg-surface-container-high/40 px-4 py-2 rounded-lg border border-white/5 font-mono text-xs flex-grow hover:border-primary/30 transition-colors">
-        <span className={`text-${color} opacity-60 mr-2`}>$</span>
-        <span className="text-white">{code}</span>
+      <div className="bg-surface-container-high/60 backdrop-blur-sm px-6 py-4 rounded-xl border border-white/5 font-mono text-sm flex-grow hover:border-primary/40 transition-all">
+        <span className={`text-${color} opacity-40 mr-3`}>$</span>
+        <span className="text-white text-opacity-90">{code}</span>
       </div>
     </div>
   )
@@ -251,27 +268,18 @@ function EditorStep({ num, code, color, bgColor }: any) {
 
 function PricingCard({ title, price, subtitle, children, popular }: any) {
   return (
-    <div className={`relative p-8 rounded-3xl border ${popular ? 'bg-surface-container-high border-primary/40 shadow-[0_0_40px_rgba(37,99,235,0.1)]' : 'bg-surface-container border-outline-variant/10'} transition-all hover:-translate-y-2`}>
+    <div className={`relative p-10 rounded-[2.5rem] border ${popular ? 'bg-surface-container-high border-primary/40 shadow-[0_0_60px_rgba(37,99,235,0.1)]' : 'bg-surface-container border-outline-variant/10'} transition-all hover:-translate-y-3 group`}>
       {popular && (
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white text-[10px] font-bold px-4 py-1 rounded-full tracking-widest uppercase">Best Value</div>
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white text-[10px] font-bold px-6 py-1.5 rounded-full tracking-widest uppercase shadow-xl">Master License</div>
       )}
-      <h3 className="text-white font-bold text-xl mb-2">{title}</h3>
-      <div className="flex items-end gap-1 mb-6">
-        <span className="text-4xl font-extrabold text-white">{price}</span>
-        <span className="text-on-surface-variant text-sm mb-1">{subtitle}</span>
+      <h3 className="text-white font-headline font-extrabold text-2xl mb-2 tracking-tight group-hover:text-primary transition-colors">{title}</h3>
+      <div className="flex items-end gap-1 mb-10">
+        <span className="text-5xl font-extrabold text-white tracking-tighter">{price}</span>
+        <span className="text-on-surface-variant text-sm mb-2 font-mono opacity-60">{subtitle}</span>
       </div>
-      <div className="space-y-4 mb-8">
+      <div className="space-y-4 mb-10">
         {children}
       </div>
-    </div>
-  )
-}
-
-function PricingFeature({ text, bold }: any) {
-  return (
-    <div className={`flex items-center gap-3 text-sm ${bold ? 'text-white font-bold' : 'text-on-surface-variant'}`}>
-      <span className="material-symbols-outlined text-primary text-lg">check_circle</span>
-      {text}
     </div>
   )
 }
