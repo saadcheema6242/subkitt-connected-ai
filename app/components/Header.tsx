@@ -9,7 +9,7 @@ import Logo from "./Logo"
 export default function Header() {
     const pathname = usePathname()
     const router = useRouter()
-    const [user] = useAuthState(auth)
+    const [user, loading] = useAuthState(auth)
 
     const ADMIN_EMAIL = "muhammadsaadc49@gmail.com"
     const isAdmin = user?.email === ADMIN_EMAIL
@@ -21,11 +21,6 @@ export default function Header() {
         { name: "About", href: "/about" },
         { name: "Download", href: "/download" },
     ]
-
-    const handleDownloadClick = () => {
-        if (!user) router.push("/login")
-        else router.push(isAdmin ? "/dashboard/admin" : "/dashboard")
-    }
 
     return (
         <header className="fixed top-0 w-full z-50 bg-[#131318]/80 backdrop-blur-xl shadow-[0_20px_40px_rgba(124,58,237,0.06)] border-b border-white/5">
@@ -42,7 +37,7 @@ export default function Header() {
                             {link.name}
                         </Link>
                     ))}
-                    {user && (
+                    {!loading && user && (
                         <Link
                             href={isAdmin ? "/dashboard/admin" : "/dashboard"}
                             className={`transition-colors text-base ${pathname.startsWith('/dashboard') ? 'text-primary border-b-2 border-primary-container pb-1' : 'text-on-surface-variant hover:text-white'}`}
@@ -53,17 +48,30 @@ export default function Header() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    {user ? (
+                    {!loading && user ? (
                         <button onClick={() => auth.signOut()} className="text-on-surface-variant hover:text-white text-sm font-bold">Sign Out</button>
                     ) : (
                         <Link href="/login" className="text-on-surface-variant hover:text-white text-sm font-bold">Login</Link>
                     )}
-                    <button
-                        onClick={handleDownloadClick}
-                        className="bg-primary-container text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:shadow-[0_0_15px_rgba(37,99,235,0.3)] transition-all duration-300 scale-95 active:scale-90"
-                    >
-                        {isAdmin ? "Manage App" : "Download Free"}
-                    </button>
+
+                    {!loading && user && isAdmin ? (
+                        <Link
+                            href="/dashboard/admin"
+                            className="bg-primary-container text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:shadow-[0_0_15px_rgba(37,99,235,0.3)] transition-all duration-300 scale-95 active:scale-90"
+                        >
+                            Manage App
+                        </Link>
+                    ) : (
+                        <button
+                            onClick={() => {
+                                if (user) router.push(isAdmin ? "/dashboard/admin" : "/dashboard")
+                                else router.push("/login")
+                            }}
+                            className="bg-primary-container text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:shadow-[0_0_15px_rgba(37,99,235,0.3)] transition-all duration-300 scale-95 active:scale-90"
+                        >
+                            Download Free
+                        </button>
+                    )}
                 </div>
             </nav>
         </header>

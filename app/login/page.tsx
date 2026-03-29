@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { auth } from "../../lib/firebase"
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth"
 import { useRouter } from "next/navigation"
+import { useAuthState } from "react-firebase-hooks/auth"
 import Header from "../components/Header"
 import Footer from "../components/Footer"
 
@@ -14,9 +15,17 @@ export default function LoginPage() {
     const [isRegistering, setIsRegistering] = useState(false)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
+    const [user, authLoading] = useAuthState(auth)
     const router = useRouter()
 
     const ADMIN_EMAIL = "muhammadsaadc49@gmail.com"
+
+    // Instant redirect if already logged in
+    useEffect(() => {
+        if (user && !authLoading) {
+            router.replace(user.email === ADMIN_EMAIL ? "/dashboard/admin" : "/dashboard")
+        }
+    }, [user, authLoading, router])
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -31,17 +40,15 @@ export default function LoginPage() {
                 userCredential = await signInWithEmailAndPassword(auth, email, password)
             }
 
-            // Speed up redirection: check email immediately
-            if (userCredential.user.email === ADMIN_EMAIL) {
-                router.push("/dashboard/admin")
-            } else {
-                router.push("/dashboard")
-            }
+            // Redirection is handled by the useEffect above
         } catch (err: any) {
             setError(err.message)
-        } finally {
             setLoading(false)
         }
+    }
+
+    if (authLoading || (user && !authLoading)) {
+        return <div className="min-h-screen bg-background flex items-center justify-center text-white font-mono">Redirecting...</div>
     }
 
     return (

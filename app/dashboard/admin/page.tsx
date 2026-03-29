@@ -60,7 +60,6 @@ export default function AdminDashboardPage() {
                 })
                 alert("Plan updated successfully!")
             } else {
-                if (!file) throw new Error("Please select an EXE file for new plans")
                 await addDoc(collection(db, "plans"), {
                     ...newPlan,
                     fileUrl,
