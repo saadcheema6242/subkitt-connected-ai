@@ -7,7 +7,7 @@ export default function AboutPage() {
             <Header />
 
             {/* Hero Section */}
-            <header className="relative h-[819px] flex items-center justify-center pt-32 overflow-hidden">
+            <header className="relative h-[819px] flex items-center justify-center pt-44 overflow-hidden">
                 <img
                     className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-lighten"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuTBpH4DHbcQOkGcHgT6B33sxeZHC2LJC-JluYlqIrCVUWBtba6fccQ4uIP2ub2oT-9KRAx6Opp4yFFqQlx-ef0hrjgRgXnHNeHFGeAgBmRRxjfkYI_jHBH7Cp2xt1s68P4MYrriO2boA1ItOkIIEVSUPl_84S1VdQ35DN2A41Zl8YFsS0mjwt_JICo3Gq90tJ54dPGxYureLKS7311Z3ZKCoMyDaEtlc0QSPjejvcZCD56kCxIwYt17bHCIAUWknfFHK1tZJqQ34"

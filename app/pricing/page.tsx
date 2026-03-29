@@ -13,7 +13,7 @@ export default function PricingPage() {
             <Header />
 
             {/* Hero Section */}
-            <section className="relative min-h-[614px] flex flex-col items-center justify-center pt-24 px-6 overflow-hidden">
+            <section className="relative min-h-[614px] flex flex-col items-center justify-center pt-44 px-6 overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <img
                         alt="Minimal Workspace"

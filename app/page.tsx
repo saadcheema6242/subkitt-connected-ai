@@ -8,7 +8,7 @@ export default function Home() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-40 overflow-hidden">
+      <section className="relative min-h-screen flex items-center pt-44 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             className="w-full h-full object-cover opacity-15 grayscale"
