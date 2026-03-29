@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { auth } from "../../lib/firebase"
+import { auth, db } from "../../lib/firebase"
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth"
 import { useRouter } from "next/navigation"
 import { useAuthState } from "react-firebase-hooks/auth"
+import { doc, setDoc, serverTimestamp } from "firebase/firestore"
 import Header from "../components/Header"
 import Footer from "../components/Footer"
 
@@ -36,6 +37,12 @@ export default function LoginPage() {
             let userCredential;
             if (isRegistering) {
                 userCredential = await createUserWithEmailAndPassword(auth, email, password)
+                // Save user to Firestore
+                await setDoc(doc(db, "users", userCredential.user.uid), {
+                    email: userCredential.user.email,
+                    createdAt: serverTimestamp(),
+                    role: "user"
+                })
             } else {
                 userCredential = await signInWithEmailAndPassword(auth, email, password)
             }

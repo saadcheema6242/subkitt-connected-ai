@@ -26,22 +26,17 @@ export default function DashboardPage() {
         if (user) {
             setIsAdmin(user.email === ADMIN_EMAIL)
 
-            // Fetch user data/purchases
             const q = query(collection(db, "purchases"), where("userId", "==", user.uid))
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 setPurchases(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
             })
 
-            // Fetch plans
             const plansQ = collection(db, "plans")
             const unsubscribePlans = onSnapshot(plansQ, (snapshot) => {
                 setPlans(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
             })
 
-            return () => {
-                unsubscribe()
-                unsubscribePlans()
-            }
+            return () => { unsubscribe(); unsubscribePlans(); }
         }
     }, [user, loading, router])
 
@@ -62,58 +57,62 @@ export default function DashboardPage() {
                 currency: "USD",
                 paymentMethod: "Stripe"
             })
-
             setIsCheckingOut(false)
             setShowStripe(null)
-            alert(`Payment Successful! Your access for ${showStripe.name} is being provisioned.`)
-        }, 2000)
+            alert(`Payment Initiated! Once verified by our financial terminal, your access for ${showStripe.name} will be active.`)
+        }, 2500)
     }
 
-    if (loading) return <div className="min-h-screen bg-background flex items-center justify-center text-white font-mono">Initializing System Core...</div>
+    if (loading) return <div className="min-h-screen bg-background flex items-center justify-center text-white font-mono">Synchronizing Neural Link...</div>
 
     return (
         <main className="min-h-screen flex flex-col pt-44 px-8 max-w-7xl mx-auto w-full bg-background">
             <Header />
 
-            <div className="flex flex-col md:flex-row justify-between items-start mb-16 gap-6 border-l-4 border-primary pl-6">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-20 gap-8 border-l-4 border-primary pl-10 relative overflow-hidden group">
+                <div className="absolute inset-0 bg-primary/5 -translate-x-full group-hover:translate-x-0 transition-transform duration-1000"></div>
                 <div>
-                    <h1 className="text-5xl font-headline font-extrabold text-white mb-3 tracking-tighter uppercase leading-[0.8]">Systems Online, {user?.email?.split("@")[0]}</h1>
-                    <p className="text-on-surface-variant font-body text-lg italic opacity-75">Operational status: <span className="text-secondary-container not-italic font-bold">OPTIMAL</span></p>
+                    <h1 className="text-6xl md:text-8xl font-headline font-extrabold text-white mb-3 tracking-tighter uppercase leading-[0.75] group-hover:tracking-normal transition-all duration-700">Digital <br /> Workspace.</h1>
+                    <p className="text-on-surface-variant font-body text-xl italic opacity-60">Identity: <span className="text-primary font-bold not-italic">{user?.email}</span></p>
                 </div>
                 <div className="flex gap-4">
                     {isAdmin && (
-                        <button onClick={() => router.push("/dashboard/admin")} className="bg-primary-container text-white px-8 py-3 rounded-2xl font-bold flex items-center gap-2 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all">
-                            <span className="material-symbols-outlined">shield_person</span> Admin Hub
+                        <button onClick={() => router.push("/dashboard/admin")} className="bg-primary-container text-white px-10 py-4 rounded-2xl font-bold flex items-center gap-3 hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all">
+                            <span className="material-symbols-outlined">shield_person</span> Security Console
                         </button>
                     )}
-                    <button onClick={() => auth.signOut()} className="bg-surface-container-high text-on-surface-variant px-8 py-3 rounded-2xl font-bold hover:bg-white hover:text-black transition-all border border-white/5">Sign Out</button>
+                    <button onClick={() => auth.signOut()} className="bg-surface-container-high text-white border border-white/5 px-10 py-4 rounded-2xl font-bold hover:bg-white hover:text-black transition-all">Sign Off</button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-32">
-                {/* Active Gear */}
-                <div className="lg:col-span-4 space-y-8">
-                    <h2 className="text-2xl font-headline font-bold text-white flex items-center gap-3">
-                        <span className="material-symbols-outlined text-primary">verified</span> Deployment Fleet
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-40">
+                {/* Active Infrastructure */}
+                <div className="lg:col-span-5 space-y-12">
+                    <h2 className="text-3xl font-headline font-bold text-white flex items-center gap-4 border-b border-white/5 pb-6">
+                        <span className="material-symbols-outlined text-primary text-4xl">verified_user</span> System Licenses
                     </h2>
-                    <div className="space-y-4">
+                    <div className="grid gap-6">
                         {purchases.length === 0 ? (
-                            <div className="bg-surface-container-low p-12 rounded-[2.5rem] border border-white/5 text-center text-on-surface-variant italic">No deployed tech found.</div>
+                            <div className="bg-surface-container-high/20 p-16 rounded-[3rem] border border-white/5 text-center text-on-surface-variant italic opacity-40">Zero systems deployed in your sector.</div>
                         ) : (
                             purchases.map((p) => (
-                                <div key={p.id} className="bg-surface-container-high/40 p-8 rounded-[2rem] border border-white/10 relative overflow-hidden group hover:border-primary/40 transition-all">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h3 className="text-white font-bold text-xl">{p.planName}</h3>
-                                        <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest ${p.status === 'approved' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                                <div key={p.id} className="bg-surface-container-high/60 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/10 relative overflow-hidden shadow-xl group">
+                                    <div className={`absolute top-0 right-0 w-2 h-full ${p.status === 'approved' ? 'bg-green-400' : 'bg-yellow-400/50'}`}></div>
+                                    <div className="flex justify-between items-center mb-8">
+                                        <div>
+                                            <h3 className="text-white font-extrabold text-2xl tracking-tight">{p.planName}</h3>
+                                            <p className="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest mt-1 italic">License ID: {p.id.slice(0, 8)}</p>
+                                        </div>
+                                        <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest border ${p.status === 'approved' ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20 animate-pulse'}`}>
                                             {p.status}
                                         </span>
                                     </div>
                                     {p.status === 'approved' ? (
-                                        <a href={p.fileUrl} className="w-full bg-primary text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white hover:text-black transition-all">
-                                            <span className="material-symbols-outlined">download</span> Get Core EXE
+                                        <a href={p.fileUrl} target="_blank" className="w-full bg-white text-black py-5 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-primary-container hover:text-white transition-all shadow-lg active:scale-95">
+                                            <span className="material-symbols-outlined">rocket_launch</span> Access Core
                                         </a>
                                     ) : (
-                                        <div className="text-[10px] text-on-surface-variant/60 font-mono bg-surface-container-lowest p-4 rounded-xl text-center border border-white/5">AUTHENTICATING...</div>
+                                        <div className="text-[10px] text-yellow-400/60 font-mono bg-yellow-400/5 p-5 rounded-2xl text-center border border-yellow-400/10 tracking-[0.2em] italic">AWAITING FINANCIAL TERMINAL APPROVAL</div>
                                     )}
                                 </div>
                             ))
@@ -121,36 +120,39 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* Marketplace */}
-                <div className="lg:col-span-8 space-y-8">
-                    <h2 className="text-2xl font-headline font-bold text-white flex items-center gap-3">
-                        <span className="material-symbols-outlined text-primary">dynamic_feed</span> Infrastructure Marketplace
+                {/* System Marketplace */}
+                <div className="lg:col-span-7 space-y-12">
+                    <h2 className="text-3xl font-headline font-bold text-white flex items-center gap-4 border-b border-white/5 pb-6">
+                        <span className="material-symbols-outlined text-primary text-4xl">inventory</span> Infrastructure Market
                     </h2>
                     <div className="grid md:grid-cols-2 gap-8">
                         {plans.map((plan) => (
-                            <div key={plan.id} className="bg-surface-container-high/60 backdrop-blur-xl p-10 rounded-[3rem] border border-white/10 transition-all flex flex-col justify-between group h-full relative overflow-hidden">
-                                {plan.isPopular && <div className="absolute top-6 right-6 text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full">Popular</div>}
+                            <div key={plan.id} className="bg-surface-container-high/30 p-10 rounded-[3.5rem] border border-white/5 hover:border-primary/40 transition-all flex flex-col justify-between group h-full relative overflow-hidden hover:bg-surface-container-high/50">
+                                {plan.isPopular && <div className="absolute top-8 right-8 text-[10px] font-bold text-primary-variant uppercase tracking-widest bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20">Optimal Performance</div>}
                                 <div>
-                                    <div className="flex items-center gap-4 mb-6">
-                                        <span className="material-symbols-outlined text-4xl text-primary">{plan.icon || 'bolt'}</span>
-                                        <h3 className="text-2xl font-headline font-extrabold text-white tracking-tight">{plan.name}</h3>
+                                    <div className="flex items-center gap-5 mb-8">
+                                        <span className="material-symbols-outlined text-5xl text-primary group-hover:scale-110 transition-transform">{plan.icon || 'bolt'}</span>
+                                        <div>
+                                            <h3 className="text-2xl font-headline font-extrabold text-white tracking-tight leading-none">{plan.name}</h3>
+                                            <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest mt-1 opacity-40">System Node</p>
+                                        </div>
                                     </div>
-                                    <p className="text-on-surface-variant text-sm leading-relaxed mb-8 italic opacity-80">{plan.description}</p>
-                                    <ul className="space-y-3 mb-10">
+                                    <p className="text-on-surface-variant text-sm mb-10 leading-relaxed italic border-l-2 border-white/5 pl-6">{plan.description}</p>
+                                    <ul className="space-y-4 mb-12">
                                         {plan.features?.slice(0, 4).map((f: string, i: number) => (
-                                            <li key={i} className="flex items-center gap-3 text-xs text-on-surface-variant">
-                                                <span className="material-symbols-outlined text-green-400 text-sm">check_circle</span> {f}
+                                            <li key={i} className="flex items-center gap-4 text-xs text-on-surface-variant font-medium">
+                                                <span className="material-symbols-outlined text-green-400 text-lg">check_circle</span> {f}
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
-                                <div className="pt-8 border-t border-white/5 flex flex-col gap-6">
+                                <div className="pt-10 border-t border-white/5 flex flex-col gap-6">
                                     <div className="flex items-end gap-1">
-                                        <span className="text-4xl font-extrabold text-white tracking-tighter">${plan.price}</span>
-                                        <span className="text-on-surface-variant text-xs mb-1 italic opacity-60">/ {plan.duration}</span>
+                                        <span className="text-5xl font-extrabold text-white tracking-tighter">${plan.price}</span>
+                                        <span className="text-on-surface-variant text-sm mb-2 italic opacity-40">/ {plan.duration}</span>
                                     </div>
-                                    <button onClick={() => setShowStripe(plan)} className="w-full bg-white text-black py-5 rounded-2xl font-bold text-lg hover:bg-primary hover:text-white transition-all shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
-                                        {plan.buttonText || 'Upgrade Now'}
+                                    <button onClick={() => setShowStripe(plan)} className="w-full bg-primary-container text-white py-5 rounded-2xl font-bold text-lg hover:shadow-[0_15px_40px_rgba(37,99,235,0.4)] transition-all animate-pulse">
+                                        {plan.buttonText || 'Deploy Core'}
                                     </button>
                                 </div>
                             </div>
@@ -159,32 +161,58 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* MOCK STRIPE MODAL (Remains similar but themed) */}
+            {/* CINEMATIC STRIPE MODAL */}
             {showStripe && (
-                <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-6">
-                    <div className="bg-[#f6f9fc] w-full max-w-xl rounded-[3rem] overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.5)] relative animate-in fade-in zoom-in duration-500">
-                        <div className="bg-[#6772e5] p-12 text-white relative">
-                            <button onClick={() => setShowStripe(null)} className="absolute top-8 right-8 text-white/60 hover:text-white">
-                                <span className="material-symbols-outlined text-3xl">close</span>
+                <div className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex items-center justify-center p-6 animate-in fade-in duration-500">
+                    <div className="bg-[#f0f4f8] w-full max-w-2xl rounded-[4rem] overflow-hidden shadow-[0_50px_150px_rgba(0,0,0,0.8)] relative animate-in scale-in duration-700">
+                        {/* High Fidelity Stripe Header */}
+                        <div className="bg-[#635bff] p-16 text-white relative">
+                            <button onClick={() => setShowStripe(null)} className="absolute top-10 right-10 text-white/40 hover:text-white transition-all transform hover:rotate-90">
+                                <span className="material-symbols-outlined text-4xl">close</span>
                             </button>
-                            <h2 className="text-5xl font-headline font-bold mb-2">${showStripe.price}.00</h2>
-                            <p className="opacity-80 text-lg uppercase tracking-widest font-bold text-xs">{showStripe.name} Deployment</p>
+                            <div className="flex items-center gap-4 mb-8 opacity-60">
+                                <span className="material-symbols-outlined text-3xl">terminal</span>
+                                <span className="text-xs font-bold tracking-[0.4em] uppercase">SubKitt Secure Payload</span>
+                            </div>
+                            <h2 className="text-6xl font-headline font-extrabold tracking-tighter">${showStripe.price}.00</h2>
+                            <p className="opacity-80 text-xl font-medium mt-2">{showStripe.name} Activation Fee</p>
                         </div>
-                        <div className="p-12">
-                            <form onSubmit={handleStripeCheckout} className="space-y-8">
-                                <div className="space-y-4">
-                                    <div className="bg-white border-2 border-slate-100 rounded-2xl p-6 shadow-sm">
-                                        <input type="text" placeholder="Card number" required className="w-full text-xl outline-none" />
-                                        <div className="flex gap-4 border-t-2 mt-6 pt-6">
-                                            <input type="text" placeholder="MM / YY" required className="w-1/2 text-xl outline-none" />
-                                            <input type="text" placeholder="CVC" required className="w-1/2 text-xl outline-none" />
+
+                        {/* High Fidelity Stripe Body */}
+                        <div className="p-16">
+                            <form onSubmit={handleStripeCheckout} className="space-y-10">
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#6b7c93] ml-1">Encrypted Card Stream</label>
+                                        <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-8 shadow-inner flex flex-col gap-6">
+                                            <input type="text" placeholder="💳 Card number" required className="w-full text-2xl outline-none font-medium placeholder:opacity-30" />
+                                            <div className="flex gap-8 border-t-2 border-slate-50 mt-2 pt-6">
+                                                <input type="text" placeholder="📅 MM / YY" required className="w-1/2 text-2xl outline-none font-medium placeholder:opacity-30" />
+                                                <input type="text" placeholder="🔒 CVC" required className="w-1/2 text-2xl outline-none font-medium placeholder:opacity-30" />
+                                            </div>
                                         </div>
                                     </div>
-                                    <input type="text" placeholder="Cardholder Name" required className="w-full bg-white border-2 border-slate-100 rounded-2xl p-6 text-xl outline-none shadow-sm" />
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#6b7c93] ml-1">Identity Label</label>
+                                        <input type="text" placeholder="Full name on instrument" required className="w-full bg-white border-2 border-slate-200 rounded-[2rem] p-8 text-2xl outline-none shadow-inner font-medium placeholder:opacity-30" />
+                                    </div>
                                 </div>
-                                <button disabled={isCheckingOut} className="w-full bg-[#32325d] text-white py-6 rounded-2xl font-bold text-xl hover:bg-black transition-all shadow-xl">
-                                    {isCheckingOut ? "Connecting to Bank..." : `Pay $${showStripe.price}`}
+                                <button disabled={isCheckingOut} className="w-full bg-[#0a2540] text-white py-8 rounded-[2rem] font-bold text-2xl hover:bg-black hover:scale-[1.02] transition-all shadow-2xl active:scale-95 flex items-center justify-center gap-4">
+                                    {isCheckingOut ? (
+                                        <>
+                                            <span className="animate-spin material-symbols-outlined text-3xl">sync</span>
+                                            AUTHENTICATING...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="material-symbols-outlined">shield</span>
+                                            PAY ${showStripe.price}.00
+                                        </>
+                                    )}
                                 </button>
+                                <div className="flex items-center justify-center gap-2 text-[#6b7c93] text-xs font-bold uppercase tracking-widest opacity-60">
+                                    <span className="material-symbols-outlined text-sm">lock</span> 🛡️ End-to-End Encryption Active
+                                </div>
                             </form>
                         </div>
                     </div>
